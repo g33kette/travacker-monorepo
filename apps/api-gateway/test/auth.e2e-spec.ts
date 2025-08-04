@@ -9,11 +9,11 @@ import {
 } from '@app/dtos'
 import { of, throwError } from 'rxjs'
 
-describe('ApiGatewayController (e2e)', () => {
+describe('AuthController (e2e)', () => {
     let app: INestApplication
 
     // Mock AUTH_SERVICE client
-    const mockAuthServiceClient = {
+    const mockAuthClient = {
         send: jest.fn(),
         connect: jest.fn().mockResolvedValue(undefined),
         close: jest.fn().mockResolvedValue(undefined),
@@ -24,8 +24,8 @@ describe('ApiGatewayController (e2e)', () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [ApiGatewayModule],
         })
-            .overrideProvider('AUTH_SERVICE')
-            .useValue(mockAuthServiceClient)
+            .overrideProvider('AUTH')
+            .useValue(mockAuthClient)
             .compile()
 
         app = moduleFixture.createNestApplication({
@@ -37,66 +37,6 @@ describe('ApiGatewayController (e2e)', () => {
     afterEach(async () => {
         jest.clearAllMocks()
         await app.close()
-    })
-
-    describe('/ (GET)', () => {
-        it('should return Hello World', () => {
-            return request(app.getHttpServer() as Server)
-                .get('/')
-                .expect(200)
-                .expect('Hello World!')
-        })
-    })
-
-    describe('/ (POST)', () => {
-        it('should return Hello World for valid data', () => {
-            const validUserData: AuthRequestAuthenticateUserDto = {
-                email: 'valid@example.com',
-                password: 'validPassword123',
-            }
-
-            return request(app.getHttpServer() as Server)
-                .post('/')
-                .send(validUserData)
-                .expect(201)
-                .expect('Hello World!')
-        })
-
-        it('should return 400 for invalid email', () => {
-            const invalidUserData = {
-                email: 'not-an-email',
-                password: 'validPassword123',
-            }
-
-            return request(app.getHttpServer() as Server)
-                .post('/')
-                .send(invalidUserData)
-                .expect(400)
-        })
-
-        it('should return 400 for short password', () => {
-            const invalidUserData = {
-                email: 'valid@example.com',
-                password: '123', // Too short
-            }
-
-            return request(app.getHttpServer() as Server)
-                .post('/')
-                .send(invalidUserData)
-                .expect(400)
-        })
-
-        it('should return 400 for missing fields', () => {
-            const incompleteData = {
-                email: 'valid@example.com',
-                // missing password
-            }
-
-            return request(app.getHttpServer() as Server)
-                .post('/')
-                .send(incompleteData)
-                .expect(400)
-        })
     })
 
     describe('/login (POST)', () => {
@@ -116,7 +56,7 @@ describe('ApiGatewayController (e2e)', () => {
         }
 
         it('should return JWT tokens for valid credentials', async () => {
-            mockAuthServiceClient.send.mockReturnValue(of(mockAuthResponse))
+            mockAuthClient.send.mockReturnValue(of(mockAuthResponse))
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -124,8 +64,8 @@ describe('ApiGatewayController (e2e)', () => {
                 .expect(201)
 
             expect(response.body).toEqual(mockAuthResponse)
-            expect(mockAuthServiceClient.send).toHaveBeenCalledWith(
-                { cmd: 'authenticate_user' },
+            expect(mockAuthClient.send).toHaveBeenCalledWith(
+                { cmd: 'auth_create_token' },
                 validLoginData,
             )
         })
@@ -142,7 +82,7 @@ describe('ApiGatewayController (e2e)', () => {
                 expiresIn: 900,
             }
 
-            mockAuthServiceClient.send.mockReturnValue(of(responseWithStringId))
+            mockAuthClient.send.mockReturnValue(of(responseWithStringId))
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -202,7 +142,7 @@ describe('ApiGatewayController (e2e)', () => {
             const error = new Error(
                 'Authentication service unavailable mock error',
             )
-            mockAuthServiceClient.send.mockReturnValue(throwError(() => error))
+            mockAuthClient.send.mockReturnValue(throwError(() => error))
 
             return request(app.getHttpServer() as Server)
                 .post('/login')
@@ -211,7 +151,7 @@ describe('ApiGatewayController (e2e)', () => {
         })
 
         it('should handle null response from auth service', async () => {
-            mockAuthServiceClient.send.mockReturnValue(of(null))
+            mockAuthClient.send.mockReturnValue(of(null))
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -228,15 +168,15 @@ describe('ApiGatewayController (e2e)', () => {
                 password: 'validPassword123',
             }
 
-            mockAuthServiceClient.send.mockReturnValue(of(mockAuthResponse))
+            mockAuthClient.send.mockReturnValue(of(mockAuthResponse))
 
             await request(app.getHttpServer() as Server)
                 .post('/login')
                 .send(complexEmail)
                 .expect(201)
 
-            expect(mockAuthServiceClient.send).toHaveBeenCalledWith(
-                { cmd: 'authenticate_user' },
+            expect(mockAuthClient.send).toHaveBeenCalledWith(
+                { cmd: 'auth_create_token' },
                 complexEmail,
             )
         })

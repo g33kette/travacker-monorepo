@@ -7,23 +7,14 @@ import {
 import { lastValueFrom } from 'rxjs'
 
 @Injectable()
-export class ApiGatewayService {
-    constructor(
-        @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
-    ) {}
-
-    getHello(): string {
-        return 'Hello World!'
-    }
+export class AuthService {
+    constructor(@Inject('AUTH') private readonly authClient: ClientProxy) {}
 
     async authenticateUser(
         loginData: AuthRequestAuthenticateUserDto,
     ): Promise<AuthResponseAuthenticateUserDto | null> {
         return await lastValueFrom(
-            this.authServiceClient.send(
-                { cmd: 'authenticate_user' },
-                loginData,
-            ),
+            this.authClient.send({ cmd: 'auth_create_token' }, loginData),
         )
     }
 }

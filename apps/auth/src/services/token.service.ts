@@ -3,12 +3,8 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthDataUserDto } from '@app/dtos'
 
 @Injectable()
-export class AuthServiceService {
+export class TokenService {
     constructor(private readonly jwtService: JwtService) {}
-
-    getHello(): string {
-        return 'Hello World!'
-    }
 
     validateUser(email: string, password: string): AuthDataUserDto {
         console.log('validateUser', email, password)

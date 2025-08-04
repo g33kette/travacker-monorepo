@@ -5,7 +5,7 @@ import {
     ClientProxy,
     ClientProxyFactory,
 } from '@nestjs/microservices'
-import { AuthServiceModule } from '../src/auth-service.module'
+import { AuthModule } from '../src/auth.module'
 import {
     AuthRequestAuthenticateUserDto,
     AuthDataUserDto,
@@ -24,7 +24,7 @@ describe('AuthService (e2e)', () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthServiceModule],
+            imports: [AuthModule],
         }).compile()
 
         // Instead of app.create(), create a microservice instance
@@ -67,7 +67,7 @@ describe('AuthService (e2e)', () => {
         expect(client).toBeDefined()
     })
 
-    describe('(microservice) authenticate_user', () => {
+    describe('auth_create_token', () => {
         it('should return JWT tokens and user data for valid credentials', async () => {
             const loginData: AuthRequestAuthenticateUserDto = {
                 email: 'test@example.com',
@@ -77,7 +77,7 @@ describe('AuthService (e2e)', () => {
             // Send the message and await the response
             const result = await lastValueFrom(
                 client.send<AuthResponseAuthenticateUserDto>(
-                    { cmd: 'authenticate_user' },
+                    { cmd: 'auth_create_token' },
                     loginData,
                 ),
             )
@@ -107,7 +107,7 @@ describe('AuthService (e2e)', () => {
 
             const result = await lastValueFrom(
                 client.send<AuthResponseAuthenticateUserDto>(
-                    { cmd: 'authenticate_user' },
+                    { cmd: 'auth_create_token' },
                     loginData,
                 ),
             )
@@ -206,7 +206,7 @@ describe('AuthService (e2e)', () => {
             try {
                 await lastValueFrom(
                     client.send<AuthDataUserDto | null>(
-                        { cmd: 'authenticate_user' },
+                        { cmd: 'auth_create_token' },
                         invalidLoginData,
                     ),
                 )

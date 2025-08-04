@@ -33,17 +33,17 @@ npm install --save-dev @types/jsonwebtoken
 
 ### 3. Files Modified
 
-#### Auth Service Module (`apps/auth-service/src/auth-service.module.ts`)
+#### Auth Service Module (`apps/auth-service/src/auth.module.ts`)
 - Added `JwtModule` configuration
 - Configured 15-minute access token expiration
 - Added JWT secret support via environment variables
 
-#### Auth Service (`apps/auth-service/src/auth-service.service.ts`)
+#### Auth Service (`apps/auth-service/src/token.service.ts`)
 - Added `JwtService` dependency injection
 - Implemented `generateTokens()` method
 - Added JWT payload structure with username and user ID
 
-#### Auth Controller (`apps/auth-service/src/auth-service.controller.ts`)
+#### Auth Controller (`apps/auth-service/src/auth.controller.ts`)
 - Updated `authenticate_user` method return type
 - Added JWT token generation to authentication flow
 - Updated imports to include new response DTO

@@ -1,22 +1,24 @@
 import { Module } from '@nestjs/common'
-import { ApiGatewayController } from './api-gateway.controller'
-import { ApiGatewayService } from './api-gateway.service'
+import { HelloController } from './controllers/hello.controller'
+import { HelloService } from './services/hello.service'
 import { ClientsModule, Transport } from '@nestjs/microservices'
+import { AuthController } from './controllers/auth.controller'
+import { AuthService } from './services/auth.service'
 
 @Module({
     imports: [
         ClientsModule.register([
             {
-                name: 'AUTH_SERVICE',
+                name: 'AUTH',
                 transport: Transport.TCP,
                 options: {
                     host: '127.0.0.1',
-                    port: (process.env.auht_service_port ?? 3001) as number,
+                    port: (process.env.auth_port ?? 3001) as number,
                 },
             },
         ]),
     ],
-    controllers: [ApiGatewayController],
-    providers: [ApiGatewayService],
+    controllers: [HelloController, AuthController],
+    providers: [HelloService, AuthService],
 })
 export class ApiGatewayModule {}
