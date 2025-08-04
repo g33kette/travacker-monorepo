@@ -3,29 +3,26 @@ import { INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { ApiGatewayModule } from '../src/api-gateway.module'
 import { Server } from 'http'
-import {
-    AuthRequestAuthenticateUserDto,
-    AuthResponseAuthenticateUserDto,
-} from '@app/dtos'
 import { of, throwError } from 'rxjs'
+import {
+    AuthClientService,
+    AuthenticateUserRequestDto,
+    AuthenticateUserResponseDto,
+} from '@app/services'
 
 describe('AuthController (e2e)', () => {
     let app: INestApplication
 
-    // Mock AUTH_SERVICE client
-    const mockAuthClient = {
-        send: jest.fn(),
-        connect: jest.fn().mockResolvedValue(undefined),
-        close: jest.fn().mockResolvedValue(undefined),
-        emit: jest.fn(),
+    const mockAuthClientService = {
+        createToken: jest.fn(),
     }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [ApiGatewayModule],
         })
-            .overrideProvider('AUTH')
-            .useValue(mockAuthClient)
+            .overrideProvider(AuthClientService)
+            .useValue(mockAuthClientService)
             .compile()
 
         app = moduleFixture.createNestApplication({
@@ -40,12 +37,12 @@ describe('AuthController (e2e)', () => {
     })
 
     describe('/login (POST)', () => {
-        const validLoginData: AuthRequestAuthenticateUserDto = {
+        const validLoginData: AuthenticateUserRequestDto = {
             email: 'test@example.com',
             password: 'password123',
         }
 
-        const mockAuthResponse: AuthResponseAuthenticateUserDto = {
+        const mockAuthResponse: AuthenticateUserResponseDto = {
             user: {
                 id: 1,
                 email: 'test@example.com',
@@ -56,7 +53,9 @@ describe('AuthController (e2e)', () => {
         }
 
         it('should return JWT tokens for valid credentials', async () => {
-            mockAuthClient.send.mockReturnValue(of(mockAuthResponse))
+            mockAuthClientService.createToken.mockReturnValue(
+                of(mockAuthResponse),
+            )
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -64,14 +63,13 @@ describe('AuthController (e2e)', () => {
                 .expect(201)
 
             expect(response.body).toEqual(mockAuthResponse)
-            expect(mockAuthClient.send).toHaveBeenCalledWith(
-                { cmd: 'auth_create_token' },
+            expect(mockAuthClientService.createToken).toHaveBeenCalledWith(
                 validLoginData,
             )
         })
 
         it('should handle string user ID', async () => {
-            const responseWithStringId: AuthResponseAuthenticateUserDto = {
+            const responseWithStringId: AuthenticateUserResponseDto = {
                 user: {
                     id: 'user-uuid-123',
                     email: 'test@example.com',
@@ -82,7 +80,9 @@ describe('AuthController (e2e)', () => {
                 expiresIn: 900,
             }
 
-            mockAuthClient.send.mockReturnValue(of(responseWithStringId))
+            mockAuthClientService.createToken.mockReturnValue(
+                of(responseWithStringId),
+            )
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -138,11 +138,13 @@ describe('AuthController (e2e)', () => {
                 .expect(400)
         })
 
-        it('should handle auth service errors', async () => {
+        it('should handle auth-client service errors', async () => {
             const error = new Error(
                 'Authentication service unavailable mock error',
             )
-            mockAuthClient.send.mockReturnValue(throwError(() => error))
+            mockAuthClientService.createToken.mockReturnValue(
+                throwError(() => error),
+            )
 
             return request(app.getHttpServer() as Server)
                 .post('/login')
@@ -150,8 +152,8 @@ describe('AuthController (e2e)', () => {
                 .expect(500)
         })
 
-        it('should handle null response from auth service', async () => {
-            mockAuthClient.send.mockReturnValue(of(null))
+        it('should handle null response from auth-client service', async () => {
+            mockAuthClientService.createToken.mockReturnValue(of(null))
 
             const response = await request(app.getHttpServer() as Server)
                 .post('/login')
@@ -168,15 +170,16 @@ describe('AuthController (e2e)', () => {
                 password: 'validPassword123',
             }
 
-            mockAuthClient.send.mockReturnValue(of(mockAuthResponse))
+            mockAuthClientService.createToken.mockReturnValue(
+                of(mockAuthResponse),
+            )
 
             await request(app.getHttpServer() as Server)
                 .post('/login')
                 .send(complexEmail)
                 .expect(201)
 
-            expect(mockAuthClient.send).toHaveBeenCalledWith(
-                { cmd: 'auth_create_token' },
+            expect(mockAuthClientService.createToken).toHaveBeenCalledWith(
                 complexEmail,
             )
         })

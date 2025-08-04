@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator'
 
-export class AuthRequestAuthenticateUserDto {
+export class AuthenticateUserRequestDto {
     @IsEmail({}, { message: 'Please enter a valid email address.' })
     @IsNotEmpty({ message: 'Email cannot be empty.' })
     readonly email: string

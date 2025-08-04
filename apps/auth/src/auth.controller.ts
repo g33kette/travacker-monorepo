@@ -1,11 +1,11 @@
 import { Controller, UsePipes } from '@nestjs/common'
 import { TokenService } from './services/token.service'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import {
-    AuthRequestAuthenticateUserDto,
-    AuthResponseAuthenticateUserDto,
-} from '@app/dtos'
 import { microserviceValidationPipe } from '@app/utils/pipes/validation-pipe'
+import {
+    AuthenticateUserRequestDto,
+    AuthenticateUserResponseDto,
+} from '@app/services'
 
 @Controller()
 export class AuthController {
@@ -14,8 +14,8 @@ export class AuthController {
     @MessagePattern({ cmd: 'auth_create_token' })
     @UsePipes(microserviceValidationPipe())
     createToken(
-        @Payload() data: AuthRequestAuthenticateUserDto,
-    ): AuthResponseAuthenticateUserDto | null {
+        @Payload() data: AuthenticateUserRequestDto,
+    ): AuthenticateUserResponseDto | null {
         const user = this.tokenService.validateUser(data.email, data.password)
         if (!user) {
             return null // Or throw a RpcException for error handling

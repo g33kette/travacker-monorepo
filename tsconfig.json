@@ -18,11 +18,11 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@app/dtos": [
-        "libs/dtos/src"
+      "@app/services": [
+        "libs/auth-client/src"
       ],
-      "@app/dtos/*": [
-        "libs/dtos/src/*"
+      "@app/services/*": [
+        "libs/auth-client/src/*"
       ],
       "@app/utils": [
         "libs/utils/src"

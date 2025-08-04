@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { AuthDataUserDto } from '@app/dtos'
+import { UserModelDto } from '@app/services'
 
 @Injectable()
 export class TokenService {
     constructor(private readonly jwtService: JwtService) {}
 
-    validateUser(email: string, password: string): AuthDataUserDto {
+    validateUser(email: string, password: string): UserModelDto {
         console.log('validateUser', email, password)
         return { id: 1, email }
     }
 
-    generateTokens(user: AuthDataUserDto) {
+    generateTokens(user: UserModelDto) {
         const payload = { username: user.email, sub: user.id }
         const accessToken = this.jwtService.sign(payload)
         const refreshToken = this.jwtService.sign(payload, {

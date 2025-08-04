@@ -25,7 +25,7 @@ npm install --save-dev @types/jsonwebtoken
 ### 2. New Files Created
 
 #### DTOs
-- `libs/dtos/src/auth/response/auth-response-authenticate-user.dto.ts`
+- `libs/dtos/src/auth/response/authenticate-user.response.dto.ts`
 - `libs/dtos/src/auth/response/index.ts`
 
 #### Configuration

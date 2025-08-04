@@ -6,17 +6,17 @@ import {
     ClientProxyFactory,
 } from '@nestjs/microservices'
 import { AuthModule } from '../src/auth.module'
-import {
-    AuthRequestAuthenticateUserDto,
-    AuthDataUserDto,
-    AuthResponseAuthenticateUserDto,
-} from '@app/dtos'
 import { lastValueFrom } from 'rxjs'
 import { ValidationErrorData } from '@app/utils'
 import * as jwt from 'jsonwebtoken'
 import { JwtPayload } from 'jsonwebtoken'
+import {
+    AuthenticateUserRequestDto,
+    AuthenticateUserResponseDto,
+    UserModelDto,
+} from '@app/services'
 
-describe('AuthService (e2e)', () => {
+describe('AuthClientService (e2e)', () => {
     let app: INestApplication
     let client: ClientProxy // Declare a client proxy for sending messages
 
@@ -69,14 +69,14 @@ describe('AuthService (e2e)', () => {
 
     describe('auth_create_token', () => {
         it('should return JWT tokens and user data for valid credentials', async () => {
-            const loginData: AuthRequestAuthenticateUserDto = {
+            const loginData: AuthenticateUserRequestDto = {
                 email: 'test@example.com',
                 password: 'password123',
             }
 
             // Send the message and await the response
             const result = await lastValueFrom(
-                client.send<AuthResponseAuthenticateUserDto>(
+                client.send<AuthenticateUserResponseDto>(
                     { cmd: 'auth_create_token' },
                     loginData,
                 ),
@@ -100,13 +100,13 @@ describe('AuthService (e2e)', () => {
         })
 
         it('should generate valid JWT tokens that can be decoded', async () => {
-            const loginData: AuthRequestAuthenticateUserDto = {
+            const loginData: AuthenticateUserRequestDto = {
                 email: 'jwt-test@example.com',
                 password: 'password123',
             }
 
             const result = await lastValueFrom(
-                client.send<AuthResponseAuthenticateUserDto>(
+                client.send<AuthenticateUserResponseDto>(
                     { cmd: 'auth_create_token' },
                     loginData,
                 ),
@@ -181,7 +181,7 @@ describe('AuthService (e2e)', () => {
             let success: boolean
             try {
                 await lastValueFrom(
-                    client.send<AuthDataUserDto | null>(
+                    client.send<UserModelDto | null>(
                         { cmd: 'hello_post' },
                         invalidUserData,
                     ),
@@ -205,7 +205,7 @@ describe('AuthService (e2e)', () => {
             let success: boolean = false
             try {
                 await lastValueFrom(
-                    client.send<AuthDataUserDto | null>(
+                    client.send<UserModelDto | null>(
                         { cmd: 'auth_create_token' },
                         invalidLoginData,
                     ),
