@@ -1,0 +1,19 @@
+node_modules
+dist
+*.log
+*.md
+.git
+.env
+docker-compose.dev.yml
+docker-compose.yml
+Dockerfile.dev
+
+# Sqlite Databases
+*.sqlite
+*.sqlite3
+
+# Notes
+todo.md
+todo.txt
+notes.md
+notes.txt

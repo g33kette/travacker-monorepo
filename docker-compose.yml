@@ -1,0 +1,35 @@
+services:
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - nestjs-network
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    container_name: auth
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - nestjs-network
+    # Expose the port internally so other services can reach it
+    # No need to expose it to the host machine
+    expose:
+      - "${AUTH_SERVICE_PORT:-3001}"
+
+networks:
+  nestjs-network:
+    driver: bridge

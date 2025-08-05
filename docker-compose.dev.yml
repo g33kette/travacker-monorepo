@@ -1,0 +1,52 @@
+services:
+  installer:
+    image: node:18-alpine
+    container_name: dev_installer
+    volumes:
+      - .:/app
+    command: npm install
+    entrypoint: ""
+    working_dir: /app
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: api-gateway_dev
+    command: npm run start:dev -- api-gateway
+    volumes:
+      - .:/app
+    networks:
+      - nestjs-dev-network
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
+    depends_on:
+      - installer
+      - auth
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - AUTH_SERVICE_HOST=auth
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: auth_dev
+    command: npm run start:dev -- auth
+    volumes:
+      - .:/app
+    networks:
+      - nestjs-dev-network
+    expose:
+      - "${AUTH_SERVICE_PORT:-3001}"
+    depends_on:
+      - installer
+    env_file:
+      - path: .env
+        required: false
+
+networks:
+  nestjs-dev-network:
+    driver: bridge
