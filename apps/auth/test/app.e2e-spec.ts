@@ -14,7 +14,7 @@ import {
     AuthenticateUserRequestDto,
     AuthenticateUserResponseDto,
     UserModelDto,
-} from '@app/services'
+} from '@app/auth-client'
 
 describe('AuthClientService (e2e)', () => {
     let app: INestApplication

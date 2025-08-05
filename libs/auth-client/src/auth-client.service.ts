@@ -4,7 +4,7 @@ import { lastValueFrom } from 'rxjs'
 import {
     AuthenticateUserRequestDto,
     AuthenticateUserResponseDto,
-} from '@app/services/dtos'
+} from '@app/auth-client/dtos'
 
 @Injectable()
 export class AuthClientService {

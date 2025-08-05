@@ -18,10 +18,10 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@app/services": [
+      "@app/auth-client": [
         "libs/auth-client/src"
       ],
-      "@app/services/*": [
+      "@app/auth-client/*": [
         "libs/auth-client/src/*"
       ],
       "@app/utils": [

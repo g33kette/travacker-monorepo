@@ -5,7 +5,7 @@ import { microserviceValidationPipe } from '@app/utils/pipes/validation-pipe'
 import {
     AuthenticateUserRequestDto,
     AuthenticateUserResponseDto,
-} from '@app/services'
+} from '@app/auth-client'
 
 @Controller()
 export class AuthController {

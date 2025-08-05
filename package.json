@@ -80,7 +80,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/services(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
+      "^@app/auth-client(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
       "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1"
     }
   }

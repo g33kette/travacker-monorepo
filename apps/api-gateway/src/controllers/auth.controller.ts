@@ -4,7 +4,7 @@ import {
     AuthClientService,
     AuthenticateUserRequestDto,
     AuthenticateUserResponseDto,
-} from '@app/services'
+} from '@app/auth-client'
 
 @Controller()
 export class AuthController {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ClientsModule, Transport } from '@nestjs/microservices'
-import { AuthClientService } from '@app/services/auth-client.service'
+import { AuthClientService } from '@app/auth-client/auth-client.service'
 
 @Module({
     imports: [
