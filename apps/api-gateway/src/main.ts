@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { ApiGatewayModule } from './api-gateway.module'
+import { Logger } from '@nestjs/common'
 
 async function bootstrap() {
     const port: number = process.env.API_GATEWAY_PORT
@@ -9,7 +10,7 @@ async function bootstrap() {
     const app = await NestFactory.create(ApiGatewayModule)
 
     await app.listen(port)
-    console.log('API Gateway is listening on port ' + port)
+    Logger.log(`🚀 API Gateway is listening on HTTP: ${port}`, 'Bootstrap')
 }
 
 void bootstrap()
