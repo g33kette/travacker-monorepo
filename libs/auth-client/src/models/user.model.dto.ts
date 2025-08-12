@@ -1,4 +1,6 @@
+import { ObjectId } from 'mongodb'
+
 export class UserModelDto {
-    readonly id: string | number
+    readonly id: ObjectId
     readonly email: string
 }

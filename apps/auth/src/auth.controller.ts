@@ -11,12 +11,20 @@ import {
 export class AuthController {
     constructor(private readonly tokenService: TokenService) {}
 
+    @MessagePattern({ cmd: 'hello' })
+    hello() {
+        return 'Hello from auth service!'
+    }
+
     @MessagePattern({ cmd: 'auth_create_token' })
     @UsePipes(microserviceValidationPipe())
-    createToken(
+    async createToken(
         @Payload() data: AuthenticateUserRequestDto,
-    ): AuthenticateUserResponseDto | null {
-        const user = this.tokenService.validateUser(data.email, data.password)
+    ): Promise<AuthenticateUserResponseDto | null> {
+        const user = await this.tokenService.validateUser(
+            data.email,
+            data.password,
+        )
         if (!user) {
             return null // Or throw a RpcException for error handling
         }

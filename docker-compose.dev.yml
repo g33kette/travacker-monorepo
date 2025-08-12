@@ -1,13 +1,4 @@
 services:
-  installer:
-    image: node:18-alpine
-    container_name: dev_installer
-    volumes:
-      - .:/app
-    command: npm install
-    entrypoint: ""
-    working_dir: /app
-
   api-gateway:
     build:
       context: .
@@ -21,7 +12,6 @@ services:
     ports:
       - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
     depends_on:
-      - installer
       - auth
     env_file:
       - path: .env
@@ -41,12 +31,31 @@ services:
       - nestjs-dev-network
     expose:
       - "${AUTH_SERVICE_PORT:-3001}"
-    depends_on:
-      - installer
     env_file:
       - path: .env
         required: false
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-password}@mongodb:27017
+
+  mongodb:
+    image: mongo:8.0
+    container_name: mongodb_dev
+    restart: unless-stopped
+    ports:
+      - "${MONGO_PORT:-27017}:${MONGO_PORT:-27017}"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-password}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - nestjs-dev-network
 
 networks:
   nestjs-dev-network:
     driver: bridge
+
+volumes:
+  mongo-data:

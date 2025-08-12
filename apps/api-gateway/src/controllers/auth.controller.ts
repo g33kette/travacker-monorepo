@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common'
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    UnauthorizedException,
+    UsePipes,
+} from '@nestjs/common'
 import { basicValidationPipe } from '@app/utils'
 import {
     AuthClientService,
@@ -10,11 +17,19 @@ import {
 export class AuthController {
     constructor(private readonly authClientService: AuthClientService) {}
 
-    @Post('/login')
+    @Get('/auth')
+    hello(): Promise<string> {
+        return this.authClientService.hello()
+    }
+    @Post('/auth/login')
     @UsePipes(basicValidationPipe())
-    login(
+    async login(
         @Body() loginData: AuthenticateUserRequestDto,
     ): Promise<AuthenticateUserResponseDto | null> {
-        return this.authClientService.createToken(loginData)
+        const response = await this.authClientService.createToken(loginData)
+        if (!response) {
+            throw new UnauthorizedException('Invalid credentials provided.')
+        }
+        return response
     }
 }

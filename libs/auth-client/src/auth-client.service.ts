@@ -10,6 +10,10 @@ import {
 export class AuthClientService {
     constructor(@Inject('AUTH') private readonly authClient: ClientProxy) {}
 
+    async hello(): Promise<string> {
+        return await lastValueFrom(this.authClient.send({ cmd: 'hello' }, {}))
+    }
+
     async createToken(
         loginData: AuthenticateUserRequestDto,
     ): Promise<AuthenticateUserResponseDto | null> {
